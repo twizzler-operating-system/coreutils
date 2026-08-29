@@ -12,7 +12,7 @@ use std::fmt::Display;
 use std::fs::{self, Metadata, OpenOptions, Permissions};
 #[cfg(unix)]
 use std::os::unix::fs::{FileTypeExt, MetadataExt, PermissionsExt};
-#[cfg(unix)]
+#[cfg(all(unix, not(target_os = "twizzler")))]
 use std::os::unix::net::UnixListener;
 use std::path::{Path, PathBuf, StripPrefixError};
 use std::{fmt, io};
@@ -2880,6 +2880,8 @@ fn copy_helper(
     #[cfg(unix)]
     if options.recursive && !options.copy_contents {
         let ft = source_metadata.file_type();
+        // Twizzler has no AF_UNIX, so a socket file cannot exist here to be copied.
+        #[cfg(not(target_os = "twizzler"))]
         if ft.is_socket() {
             return copy_socket(dest, options.overwrite, options.debug);
         }
@@ -2936,7 +2938,7 @@ fn copy_fifo(dest: &Path, overwrite: OverwriteMode, debug: bool) -> CopyResult<(
         .map_err(|_| translate!("cp-error-cannot-create-fifo", "path" => dest.quote()).into())
 }
 
-#[cfg(unix)]
+#[cfg(all(unix, not(target_os = "twizzler")))]
 fn copy_socket(dest: &Path, overwrite: OverwriteMode, debug: bool) -> CopyResult<()> {
     if dest.exists() {
         overwrite.verify(dest, debug)?;

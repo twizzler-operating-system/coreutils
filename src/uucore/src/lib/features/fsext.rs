@@ -100,6 +100,7 @@ pub use libc::statfs as StatFs;
     target_os = "solaris",
     target_os = "redox",
     target_os = "cygwin",
+    target_os = "twizzler",
 ))]
 pub use libc::statvfs as StatFs;
 
@@ -119,6 +120,7 @@ pub use libc::statfs as statfs_fn;
     target_os = "dragonfly",
     target_os = "redox",
     target_os = "cygwin",
+    target_os = "twizzler",
 ))]
 pub use libc::statvfs as statfs_fn;
 
@@ -537,7 +539,8 @@ pub fn read_fs_list() -> UResult<Vec<MountInfo>> {
         target_os = "redox",
         target_os = "illumos",
         target_os = "solaris",
-        target_os = "wasi"
+        target_os = "wasi",
+        target_os = "twizzler"
     ))]
     {
         // No method to read mounts on these platforms
@@ -700,6 +703,7 @@ impl FsMeta for StatFs {
             not(target_os = "redox"),
             not(target_arch = "s390x"),
             not(target_os = "cygwin"),
+            not(target_os = "twizzler"),
             target_pointer_width = "64"
         ))]
         return self.f_bsize;
@@ -728,6 +732,7 @@ impl FsMeta for StatFs {
             target_os = "redox",
             target_os = "cygwin",
             all(target_os = "android", target_pointer_width = "64"),
+            target_os = "twizzler",
         ))]
         return self.f_bsize.try_into().unwrap();
     }
